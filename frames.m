@@ -166,7 +166,7 @@ for j = start:numframes
     contour(X_for_plot,Y_for_plot,W_PHI_for_plot,[0 0],'k')
     hold on
      %surf(X_for_plot,Y_for_plot,1.0-H_for_plot)
-     quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
+     %quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
      %quiver(X_for_plot,Y_for_plot,PHIX_for_plot,PHIY_for_plot)
 
     if INT(2) == 1 
@@ -184,7 +184,7 @@ for j = start:numframes
 	     INT(52), INT(53),'o')
     
     end
-    axis equal
+    %axis equal
     axis([-0.1 9.2 -0.1 0.85])
     %axis([-0.1 1.1 -0.1 1.1])
  %%   hy =    figure(1)

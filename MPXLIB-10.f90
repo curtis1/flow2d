@@ -3204,12 +3204,12 @@ PROGRAM MPXLIB
           
         IF (wedge .EQV. .TRUE.) THEN      
             
-            IF (time < 8.0) THEN      
+            !IF (time < 8.0) THEN      
                 n12_w_vy = (2*pi)*(0.081)*(0.50)*sin(2*pi*(0.50)*(time + 0.5*deltaT))
                 
-            else
-                n12_w_vy = 0
-            ENDIF
+            !else
+            !    n12_w_vy = 0
+            !ENDIF
 
             ! Calculate d(n+1)                
             !n1_rb_dx = n_rb_dx + deltaT*n12_rb_vx 
@@ -3300,11 +3300,11 @@ PROGRAM MPXLIB
             wedge_force = n_w_inert + n_w_conv + n_w_grav
             wedge_work = wedge_work - (wedge_force * n1_w_vy * deltaT)
             
-            IF (time < 8.0) THEN
+            !IF (time < 8.0) THEN
                 n1_w_vy = (2*pi)*(0.081)*(0.50)*sin(2*pi*(0.50)*time)            
-            else
-                n1_w_vy = 0      
-            ENDIF
+            !else
+            !    n1_w_vy = 0      
+            !ENDIF
 
         ENDIF
           
