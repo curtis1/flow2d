@@ -1168,8 +1168,8 @@ PROGRAM MPXLIB
                         !phi_y(i,j) = - 2.0*(ywhole(j) - 0.75)*exp(-(xwhole(i)-0.5)**2.0-(ywhole(j)-0.75)**2.0)
                         !phi_xy(i,j) = 0
 
-                        drop = .TRUE.
-                        !drop = .FALSE.
+                        !drop = .TRUE.
+                        drop = .FALSE.
                         if (drop) then
         
                             !phiLS(i,j) =   exp(-(xwhole(i)-0.004)**2.0-(ywhole(j)-0.006)**2.0) - exp(-0.001**2.0)
@@ -2358,7 +2358,7 @@ PROGRAM MPXLIB
         ! ---- BEACH ----
         ! Requires dimensions: 9.114 x ~0.7595 (Actual Tank Dimensions)
         ! Remains stationary so no need for its own Heaviside function
-        beach = .FALSE.
+        beach = .TRUE.
         if (beach) then
             DO i=1,Nx+1
                 DO j=1,Ny+2

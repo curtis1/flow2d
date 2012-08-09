@@ -81,17 +81,17 @@ hold on
 %hold on
 %surf(X_for_plot,Y_for_plot,H_for_plot) 
 hold on
-%contour(X_for_plot,Y_for_plot,PHI_for_plot,100)
+contour(X_for_plot,Y_for_plot,PHI_for_plot,100)
 hold on
-%contour(X_for_plot,Y_for_plot,PHI_for_plot,[0 0],'k')
+contour(X_for_plot,Y_for_plot,PHI_for_plot,[0 0],'k')
 % contour(X_for_plot,Y_for_plot,S_PHI_for_plot,[0 0],'k')
 %hold on
-% contour(X_for_plot,Y_for_plot,W_PHI_for_plot,[0 0],'k')
+ contour(X_for_plot,Y_for_plot,W_PHI_for_plot,[0 0],'k')
 hold on
 %surf(X_for_plot,Y_for_plot,sqrt(PHIX_for_plot.^2+PHIY_for_plot.^2))
-surf(X_for_plot,Y_for_plot,FSIG_for_plot)
+%surf(X_for_plot,Y_for_plot,FSIG_for_plot)
 %surf(X_for_plot(4:end-4,4:end-4),Y_for_plot(4:end-4,4:end-4),FSIG_for_plot(4:end-4,4:end-4))
-%quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
+quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
 %quiver(X_for_plot,Y_for_plot,PHIX_for_plot,PHIY_for_plot)
 
 %if INT(2) == 1 
@@ -111,7 +111,8 @@ surf(X_for_plot,Y_for_plot,FSIG_for_plot)
 %end
 
 axis equal
-axis([-0.000 0.00625 -0.000 0.0125])
+axis([-0.000 9.12 -0.000 0.76])
+%axis([-0.000 0.00625 -0.000 0.0125])
 %axis([-0.1 1.1 -0.1 1.1])
 %%   hy =    figure(1)
   hpress = figure(1);

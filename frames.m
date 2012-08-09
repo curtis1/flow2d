@@ -163,11 +163,10 @@ for j = start:numframes
     %hold on
     % contour(X_for_plot,Y_for_plot,S_PHI_for_plot,[0 0],'k')
     %hold on
-     %contour(X_for_plot,Y_for_plot,PHI_for_plot,40)
-    %contour(X_for_plot,Y_for_plot,W_PHI_for_plot,[0 0],'k')
+    contour(X_for_plot,Y_for_plot,W_PHI_for_plot,[0 0],'k')
     hold on
      %surf(X_for_plot,Y_for_plot,1.0-H_for_plot)
-     %quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
+     quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
      %quiver(X_for_plot,Y_for_plot,PHIX_for_plot,PHIY_for_plot)
 
     if INT(2) == 1 
@@ -186,7 +185,7 @@ for j = start:numframes
     
     end
     axis equal
-    axis([-0.0 0.00625 -0.0 0.0125])
+    axis([-0.1 9.2 -0.1 0.85])
     %axis([-0.1 1.1 -0.1 1.1])
  %%   hy =    figure(1)
       hpress = figure(1);

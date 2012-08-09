@@ -1,9 +1,9 @@
 This is a data file, do not change format
 !** GEOMETRY **
-           Nx = 30
-           Ny = 100
-           Lx = 0.00625
-           Ly = 0.01250
+           Nx = 480
+           Ny = 40
+           Lx = 9.114
+           Ly = 0.7595
 !
 !
 !** SOLVERS **
@@ -16,9 +16,9 @@ This is a data file, do not change format
 !
 !
 !** TIME **
-   time_print = 0.0002
-     time_max = 1000.00
-    stability = 0.25
+   time_print = 0.02
+     time_max = 200.00
+    stability = 0.5
 !
 !
 !** INTERFACE **
@@ -26,12 +26,12 @@ This is a data file, do not change format
 ! reinstep - time (in sec) between L.S. reinitialization (G.A.L.S. only)
    trackphase = T
       LS_type = 3
-        width = 6
+        width = 5
      reintime = 0.0005
      reinstep = 99999999
    immersedbc = F
    rigidbody  = F
-        wedge = F
+        wedge = T
 !
 !
 !** CANNED BENCHMARKS **
@@ -53,7 +53,7 @@ This is a data file, do not change format
       rho_two = 1.2255
        mu_one = 0.001137
        mu_two = 0.0000178
-        sigma = 0.0712
+        sigma = 0.0
            gx = 0.0000E+00
            gy = 9.81
 !
@@ -61,7 +61,7 @@ This is a data file, do not change format
 !** BOUNDARY TYPES **
 ! velocity BC types - (1) diriclet wall, (2) neumman wall (also symmetry),
 		      (3) free surface, (4) pressure, (5) flow, (6) contact line
-      BCnorth =          1
+      BCnorth =          4
       BCsouth =          1
        BCeast =          1
        BCwest =          1
@@ -98,7 +98,7 @@ This is a data file, do not change format
       a_phiLS = 0.0
       b_phiLS = 0.0
       c_phiLS = 0.0
-      d_phiLS = -0.5
+      d_phiLS = 0.45
       e_phiLS = 0.0
       f_phiLS = -1.0
       v_phiLS = 0.0

@@ -1,8 +1,8 @@
 % Script to collect & organize specific data
 
-function result = posi(start,numframes)
-
+start = 1;
 filenum = start;
+numframes = 700;
 result = zeros(numframes,2);
 
 for j = start:numframes
@@ -32,7 +32,7 @@ for j = start:numframes
     
     totalpts = xnodes*ynodes;
 
-    data = fscanf(fid,'%g',[14,totalpts]);
+    data = fscanf(fid,'%g',[15,totalpts]);
     
     X = data(1,:)';
     Y = data(2,:)';
@@ -67,7 +67,7 @@ for j = start:numframes
 
     % What are we looking for?  Goes here:
     
-    xl = 60;
+    xl = 240;
     k = 1;
     
     PHI_for_plot;
@@ -77,7 +77,7 @@ for j = start:numframes
     end
     k = k-1;
     
-    result(j,1) = j;
+    result(j,1) = j*.02;
     result(j,2) = Y_for_plot(k,xl) - PHI_for_plot(k,xl)/PHIY_for_plot(k,xl);
     
     fclose(fid);
@@ -89,4 +89,3 @@ end
 
 plot(result(:,2))
 
-end
