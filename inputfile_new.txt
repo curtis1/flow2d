@@ -1,6 +1,6 @@
 This is a data file, do not change format
 !** GEOMETRY **
-           Nx = 50
+           Nx = 30
            Ny = 100
            Lx = 0.00625
            Ly = 0.01250
