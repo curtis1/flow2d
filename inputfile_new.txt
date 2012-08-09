@@ -1,0 +1,155 @@
+This is a data file, do not change format
+!** GEOMETRY **
+           Nx = 50
+           Ny = 100
+           Lx = 0.00625
+           Ly = 0.01250
+!
+!
+!** SOLVERS **
+   solvertype =          2
+      itermax =      50000
+    tolerance = 0.1000E-15
+    iterprint =       1500
+      precond =          1
+        omega = 0.1000E+01
+!
+!
+!** TIME **
+   time_print = 0.0002
+     time_max = 1000.00
+    stability = 0.25
+!
+!
+!** INTERFACE **
+! LS_type - (1) Standard, (2) CLSVOF, (3) G.A.L.S.
+! reinstep - time (in sec) between L.S. reinitialization (G.A.L.S. only)
+   trackphase = T
+      LS_type = 3
+        width = 6
+     reintime = 0.0005
+     reinstep = 99999999
+   immersedbc = F
+   rigidbody  = F
+        wedge = F
+!
+!
+!** CANNED BENCHMARKS **
+        slosh = F
+     dambreak = F
+         wave = F
+        waveh = 0.35
+!
+!
+!** PROPERTIES ** 
+! material_one => phi>0 and H=1
+! material_two => phi<0 and H=0
+     rb_shape = 1
+     int_type = 2
+      RB_lock = 0
+     rb1_mass = 58.0
+       buoy_J = 1.0
+      rho_one = 1000.0
+      rho_two = 1.2255
+       mu_one = 0.001137
+       mu_two = 0.0000178
+        sigma = 0.0712
+           gx = 0.0000E+00
+           gy = 9.81
+!
+!
+!** BOUNDARY TYPES **
+! velocity BC types - (1) diriclet wall, (2) neumman wall (also symmetry),
+		      (3) free surface, (4) pressure, (5) flow, (6) contact line
+      BCnorth =          1
+      BCsouth =          1
+       BCeast =          1
+       BCwest =          1
+!
+!** BOUNDARY CONDITIONS **
+! velocity boundary conditions [applicable for BC types (1) and (4)]
+       unorth = 0.0
+       usouth = 0.0000E+00
+        ueast = 0.0000E+00
+        uwest = 0.0000E+00
+!
+      vnorth  = 0.0000E+00
+       vsouth = 0.0000E+00
+        veast = 0.0000E+00
+        vwest = 0.0000E+00
+!
+! pressure dirclet BCs
+       Pnorth = 0.0000E+00
+       Psouth = 0.0000E+00
+        Peast = 0.0000E+00
+        Pwest = 0.0000E+00
+!
+! contact line boundary conditions
+! Ucl = contC*(angle - contA)**contM	if angle(phi) > contA
+! Ucl = -contC*(contR - angle)**contM	if angle(phi) < contR
+        contC = 0.0000E+00
+        contA = 0.0000E+00
+        contR = 0.0000E+00
+        contM = 0.0000E+00
+!
+!
+!** INITIAL CONDITIONS FOR FREE SURFACE **
+! phiLS = a*sqrt( (x-b)^2 +(y-c)^2 ) + d + ex + fy
+      a_phiLS = 0.0
+      b_phiLS = 0.0
+      c_phiLS = 0.0
+      d_phiLS = -0.5
+      e_phiLS = 0.0
+      f_phiLS = -1.0
+      v_phiLS = 0.0
+!
+!
+!** RIGID BODY CIRCLE PARAMETERS **
+! s_phiLS = a*sqrt( (x-b)^2 +(y-c)^2 ) + d
+       a_rbLS = -1.0
+       b_rbLS = 0.5
+       c_rbLS = 0.6
+       d_rbLS = 0.2
+!
+!
+!** RIGID BODY ELLIPSE PARAMETERS **
+! s_phiLS = 
+     aellipse = 0.2
+     bellipse = 0.1
+           xo = 0.5
+           yo = 0.4
+          tho = 12.0
+!
+!
+!** RIGID BODY SQUARE PARAMETERS **
+! s_phiLS =
+         c_xo = 2.5
+         c_yo = 0.40
+           x1 = 2.6
+           y1 = 0.65
+           x2 = 2.4
+           y2 = 0.65
+           x3 = 2.4
+           y3 = 0.15
+           x4 = 2.6
+           y4 = 0.15
+          tho = 0.0
+          cgx = 2.5
+          cgy = 0.25
+!
+!
+!** TORSIONAL DISC PARAMETERS (int_type = 1) **^M
+     rb2_mass = 15.0 
+      small_J = 0.05
+          k12 = 0.5
+          c12 = 1.0
+!
+!
+!** SLIDER PARAMETERS (int_type = 2 OR 3) **^M
+      rb2_mass = 1.0 
+          kx12 = 1000.0
+        y_diff = 0.1
+          ky12 = 37.0
+        kscale = 5.0
+          cy12 = 2.0
+!
