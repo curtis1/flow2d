@@ -945,6 +945,31 @@ SUBROUTINE VOLUMESOLVE(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,
     ENDDO
     
 END SUBROUTINE VOLUMESOLVE
+
+SUBROUTINE VOLUMEFIX(Nx,Ny,hx,hy,phi,prox,volume,volume0)
+    implicit none
+
+    integer, intent(in) :: Nx,Ny
+    real(kind=8), intent(in) :: hx,hy
+    real(kind=8), dimension(Nx+2,Ny+2), intent(inout) :: phi   
+    integer, dimension(Nx+2,Ny+2), intent(in) :: prox
+    real(kind=8), intent(in) :: volume,volume0
+
+    integer :: i,j,k,l
+    real(kind=8) :: kappa
+
+    kappa = 0.05*sqrt(hx*hx+hy*hy)
+
+    DO i=1,Nx+2
+        DO j=1,Ny+2
+
+            phi(i,j) = phi(i,j) + kappa*(volume0 - volume)
+            
+        ENDDO
+    ENDDO
+
+END SUBROUTINE VOLUMEFIX
+
 !********************************************************************
 !*                                                                                                                                        *
 !*                                                             BCGRAD                                                               *

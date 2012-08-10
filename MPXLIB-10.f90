@@ -1943,7 +1943,25 @@ PROGRAM MPXLIB
     	    ! Approximate interface location
             tempa(1) = -phiLS(maxi,maxj)*hy/(phiLS(maxi,maxj+1) - phiLS(maxi,maxj))
             tempa(2) = ywhole(maxj)+tempa(1)
+
+		! Locate free surface position peak
+        ELSEIF (wedge .eqv. .true.) THEN
+        
+            maxi = Nx/2
+            maxj = 1
+
+        	DO j = 2,Ny+1
+                    
+                    IF ((phiLS(i,j) >= 0.0) .AND. (j > maxj)) THEN
+                        maxj = j
+                    ENDIF
+                                            
+            ENDDO
             
+    	    ! Approximate interface location
+            tempa(1) = -phiLS(maxi,maxj)*hy/(phiLS(maxi,maxj+1) - phiLS(maxi,maxj))
+            tempa(2) = ywhole(maxj)+tempa(1)
+                        
         ! Slosh benchmark data
         ELSEIF (slosh .eqv. .true.) THEN
         
@@ -3150,6 +3168,11 @@ PROGRAM MPXLIB
     
 				CALL VOLUMESOLVE(Nx,Ny,hx,hy,xwhole,ywhole,GA,&
 								 scal,phiLS,phi_x,phi_y,phi_xy,prox,volume)
+								 
+				if (1.0-abs(volume/volume0) > 0.001) then
+					CALL VOLUMEFIX(Nx,Ny,hx,hy,phiLS,prox,volume,volume0)
+				endif
+								 
 								 
 				print *, "VOLUME FRACTION = ",volume/volume0
         

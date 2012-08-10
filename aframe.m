@@ -91,8 +91,8 @@ hold on
 %surf(X_for_plot,Y_for_plot,sqrt(PHIX_for_plot.^2+PHIY_for_plot.^2))
 %surf(X_for_plot,Y_for_plot,FSIG_for_plot)
 %surf(X_for_plot(4:end-4,4:end-4),Y_for_plot(4:end-4,4:end-4),FSIG_for_plot(4:end-4,4:end-4))
-quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
-%quiver(X_for_plot,Y_for_plot,PHIX_for_plot,PHIY_for_plot)
+%quiver(X_for_plot,Y_for_plot,U_for_plot,V_for_plot)
+quiver(X_for_plot,Y_for_plot,PHIX_for_plot,PHIY_for_plot)
 
 %if INT(2) == 1 
 %    cgx = INT(50);

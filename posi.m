@@ -2,7 +2,7 @@
 
 start = 1;
 filenum = start;
-numframes = 850;
+numframes = 7000;
 result = zeros(numframes,2);
 
 for j = start:numframes

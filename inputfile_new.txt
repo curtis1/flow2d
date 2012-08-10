@@ -1,7 +1,7 @@
 This is a data file, do not change format
 !** GEOMETRY **
-           Nx = 480
-           Ny = 40
+           Nx = 600
+           Ny = 50
            Lx = 9.114
            Ly = 0.7595
 !
@@ -18,7 +18,7 @@ This is a data file, do not change format
 !** TIME **
    time_print = 0.02
      time_max = 200.00
-    stability = 0.5
+    stability = 0.05
 !
 !
 !** INTERFACE **
