@@ -632,7 +632,7 @@ SUBROUTINE BCCHECK(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox
     DO i=2,Nx+1
         DO j=2,Ny+1
 
-            if (prox(i,j) == width-1 .AND. phi(i,j) < max(hx,hy)) then 
+            if (prox(i,j) == width-1 .AND. abs(phi(i,j)) < max(hx,hy)) then 
 
                 trigger = .TRUE.
                 continue

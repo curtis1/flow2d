@@ -1207,7 +1207,8 @@ PROGRAM MPXLIB
         ! ------------------------------ !
         
         if (LS_type == 3) then
-		
+
+    		CALL CROSSDERV(Nx,Ny,hx,hy,phiLS,phi_x,phi_y,phi_xy,prox,width)   
 			CALL REBUILD(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phiLS,phi_x,phi_y,phi_xy,prox,width)
 			
 			! Volume routines
