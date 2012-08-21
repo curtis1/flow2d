@@ -30,15 +30,19 @@ This is a data file, do not change format
      reintime = 0.0005
      reinstep = 99999999
    immersedbc = F
-   rigidbody  = F
-        wedge = T
 !
 !
-!** CANNED BENCHMARKS **
+!** BENCHMARKING TOOLS **
         slosh = F
      dambreak = F
          wave = F
         waveh = 0.35
+         reef = F
+    rigidbody = F
+        wedge = T
+        beach = T
+         freq = 0.75
+       wedgeT = 200.0
 !
 !
 !** PROPERTIES ** 

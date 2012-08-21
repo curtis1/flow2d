@@ -78,8 +78,8 @@ PROGRAM MPXLIB
         ! LOGICAL AND CHARACTER
         logical :: startup,trackphase,immersedbc                    ! booleans  
         logical :: rigidbody                                        ! Include rigid body
-        logical :: wedge,beach,drop                                 ! Wedge
-        logical :: dambreak, wave, slosh                                   ! Benchmarks
+        logical :: wedge,beach,drop,reef                            ! Wedge
+        logical :: dambreak, wave, slosh                            ! Benchmarks
         logical :: inside                                           ! dummy variable
         character(40) :: filename,variables,startfile               ! strings
         !
@@ -92,6 +92,7 @@ PROGRAM MPXLIB
         real(kind=8) :: deltaT,hx,hy,deltaTau               ! incremenit
         real(kind=8) :: time,time_max, &
                         time_print,time_count                       ! time variables
+        real(kind=8) :: freq,wedgeT									! wedge frequency in Hz (Ex: 0.75)
         real(kind=8) :: stability,reintime
         real(kind=8) :: rho_one,rho_two,rho_three,mu_one,&        
                         mu_two,mu_three,sigma                       ! properties
@@ -398,8 +399,6 @@ PROGRAM MPXLIB
         READ (UNIT=2,FMT=70) reintime                                ! For standard L.S. only
         READ (UNIT=2,FMT=60) reinstep                                ! For G.A.L.S. only
         READ (UNIT=2,FMT=80) immersedbc                              ! use immersedbc
-        READ (UNIT=2,FMT=80) rigidbody                               ! add rigid body
-        READ (UNIT=2,FMT=80) wedge                                   ! use wedge
         !
         !
         READ (UNIT=2,FMT=50) variables                               ! skip blank line
@@ -409,6 +408,12 @@ PROGRAM MPXLIB
         READ (UNIT=2,FMT=80) dambreak                                ! dambreak benchmark
         READ (UNIT=2,FMT=80) wave                                    ! wave benchmark
         READ (UNIT=2,FMT=70) waveh                                   ! wave height        
+        READ (UNIT=2,FMT=80) reef                                    ! reef for wave benchmark
+        READ (UNIT=2,FMT=80) rigidbody                               ! add rigid body
+        READ (UNIT=2,FMT=80) wedge                                   ! use wedge
+        READ (UNIT=2,FMT=80) beach                                   ! use beach (with wedge)
+        READ (UNIT=2,FMT=70) freq									 ! wedge frequency (Hz)
+        READ (UNIT=2,FMT=70) wedgeT									 ! wedge time limit
         !
         !
         READ (UNIT=2,FMT=50) variables                               ! skip blank line
@@ -1084,12 +1089,12 @@ PROGRAM MPXLIB
                     ELSEIF (wave .eqv. .true.) THEN
                         
                         ! FIRST-ORDER WAVE PROFILE
-                        d_phiLS = Ly/2.0
-                        phiLS(i,j) = waveh/(cosh(sqrt(3.0*waveh)/2.0*xwhole(i))**2.0) + d_phiLS - ywhole(j)
-
-						phi_x(i,j) = (phiLS(i,j)-d_phiLS+ywhole(j))*(-sqrt(3.0*waveh)/2.0)* &
-									 tanh(sqrt(3.0*waveh)/2.0*xwhole(i))
-						phi_y(i,j) = -1.0
+                        !d_phiLS = Ly/2.0
+                        !phiLS(i,j) = waveh/(cosh(sqrt(3.0*waveh)/2.0*xwhole(i))**2.0) + d_phiLS - ywhole(j)
+						!
+						!phi_x(i,j) = (phiLS(i,j)-d_phiLS+ywhole(j))*(-sqrt(3.0*waveh)/2.0)* &
+						!			 tanh(sqrt(3.0*waveh)/2.0*xwhole(i))
+						!phi_y(i,j) = -1.0
                         
                         ! SECOND-ORDER WAVE PROFILE
                         !phiLS(i,j) = 1.0 + waveh/(cosh(d_phiLS*(xwhole(i)-10.0))**2.0) &
@@ -1100,15 +1105,15 @@ PROGRAM MPXLIB
                         !phi_y(i,j) = -1.0
 
                         ! THIRD-ORDER WAVE PROFILE
-                        !d_phiLS = sqrt(3.0*waveh/4.0)*(1.0-5.0*waveh/8.0+71.0*waveh*waveh/128.0)
-                        !sw = 1/cosh(d_phiLS*(xwhole(i)-10.0))
-                        !tw = tanh(d_phiLS*(xwhole(i)-10.0))
-                        !phiLS(i,j) = 1.0 + waveh*sw*sw - 0.75*waveh*waveh*sw*sw*tw*tw &
-                        !                 + waveh**3.0*(5.0/8.0*sw*sw*tw*tw - 101.0/80.0*(sw**4.0)*tw*tw) - ywhole(j)
-                        !phi_x(i,j) = -1/40.0*d_phiLS*waveh*tw*sw*sw*(50.0*waveh**2.0*tw*tw + 101.0*waveh**2.0*sw**4.0 &
-                        !             - 50.0*waveh**2.0*sw*sw - 202.0*waveh*waveh*tw*tw*sw*sw - 60.0*waveh*tw*tw &
-                        !             + 60.0*waveh*sw*sw + 80.0)
-                        !phi_y(i,j) = -1.0
+                        d_phiLS = sqrt(3.0*waveh/4.0)*(1.0-5.0*waveh/8.0+71.0*waveh*waveh/128.0)
+                        sw = 1/cosh(d_phiLS*(xwhole(i)-10.0))
+                        tw = tanh(d_phiLS*(xwhole(i)-10.0))
+                        phiLS(i,j) = 1.0 + waveh*sw*sw - 0.75*waveh*waveh*sw*sw*tw*tw &
+                                         + waveh**3.0*(5.0/8.0*sw*sw*tw*tw - 101.0/80.0*(sw**4.0)*tw*tw) - ywhole(j)
+                        phi_x(i,j) = -1/40.0*d_phiLS*waveh*tw*sw*sw*(50.0*waveh**2.0*tw*tw + 101.0*waveh**2.0*sw**4.0 &
+                                     - 50.0*waveh**2.0*sw*sw - 202.0*waveh*waveh*tw*tw*sw*sw - 60.0*waveh*tw*tw &
+                                     + 60.0*waveh*sw*sw + 80.0)
+                        phi_y(i,j) = -1.0
 
                         !if (i < Nx+2 .AND. phiLS(i,j) > -0.20) then
                              
@@ -2376,7 +2381,6 @@ PROGRAM MPXLIB
         ! ---- BEACH ----
         ! Requires dimensions: 9.114 x ~0.7595 (Actual Tank Dimensions)
         ! Remains stationary so no need for its own Heaviside function
-        beach = .TRUE.
         if (beach) then
             DO i=1,Nx+1
                 DO j=1,Ny+2
@@ -2401,7 +2405,33 @@ PROGRAM MPXLIB
                 ENDDO
             ENDDO
         endif
-                
+
+        ! ---- REEF ----
+        ! Requires dimensions: 40.0 x 2.0
+        ! Remains stationary so no need for its own Heaviside function
+        ! Intended for use with wave option
+        if (reef) then
+            DO i=1,Nx+1
+                DO j=1,Ny+2
+
+                    if (ywhole(j) .LE. 0.85 .AND. xwhole(i) .GE. 20.0) then
+                        u(i,j) = 0.0
+                    endif
+
+                ENDDO
+            ENDDO
+            DO i=1,Nx+2
+                DO j=1,Ny+1
+
+                    if (ywhole(j) .LE. 0.85 .AND. xwhole(i) .GE. 20.0) then
+                        v(i,j) = 0.0
+                    endif
+
+                ENDDO
+            ENDDO
+        endif
+        
+                        
         ! ---- CONVECTIVE TERMS WITH NO UPWINDING ---- !
         ! ---- Unstable for very convective problems ---- !
         ! calculating the convection term for the x-momentum equation
@@ -3227,12 +3257,12 @@ PROGRAM MPXLIB
           
         IF (wedge .EQV. .TRUE.) THEN      
             
-            !IF (time < 8.0) THEN      
-                n12_w_vy = (2*pi)*(0.081)*(0.50)*sin(2*pi*(0.50)*(time + 0.5*deltaT))
+            IF (time < wedgeT) THEN      
+                n12_w_vy = (2*pi)*(0.081)*(freq)*sin(2*pi*(freq)*(time + 0.5*deltaT))
                 
-            !else
-            !    n12_w_vy = 0
-            !ENDIF
+            else
+                n12_w_vy = 0
+            ENDIF
 
             ! Calculate d(n+1)                
             !n1_rb_dx = n_rb_dx + deltaT*n12_rb_vx 
@@ -3323,11 +3353,11 @@ PROGRAM MPXLIB
             wedge_force = n_w_inert + n_w_conv + n_w_grav
             wedge_work = wedge_work - (wedge_force * n1_w_vy * deltaT)
             
-            !IF (time < 8.0) THEN
-                n1_w_vy = (2*pi)*(0.081)*(0.50)*sin(2*pi*(0.50)*time)            
-            !else
-            !    n1_w_vy = 0      
-            !ENDIF
+            IF (time < wedgeT) THEN
+                n1_w_vy = (2*pi)*(0.081)*(freq)*sin(2*pi*(freq)*time)            
+            else
+                n1_w_vy = 0      
+            ENDIF
 
         ENDIF
           
@@ -4810,7 +4840,7 @@ SUBROUTINE BCVELOCITY(Nx,Ny,u,v,BCnorth,BCsouth,BCeast,BCwest,&
 
         real(kind=8), dimension(Nx+1,Ny+2), intent(inout) :: u
         real(kind=8), dimension(Nx+2,Ny+1), intent(inout) :: v
-        real(kind=8), dimension(Nx+2,Ny+2), intent(in) :: phiLS
+        real(kind=8), dimension(Nx+2,Ny+2), intent(inout) :: phiLS
 
         real(kind=8), external :: CONTACTSPEED
 

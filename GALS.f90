@@ -114,13 +114,7 @@ SUBROUTINE GALS(Nx,Ny,hx,hy,deltaT,xwhole,ywhole,GA,scal, &
                 phi_y(i,j) = DX3(2,1)*herm(2) + DX3(2,2)*herm(3)
                                          
             endif
-            
-            !if (prox(i,j) == width .AND. abs(phi_x(i,j)) > 3.0 .OR. abs(phi_y(i,j)) > 3.0) then
-            ! 	phi(i,j) = phin(i,j)
-            ! 	phi_x(i,j) = phi_xn(i,j)
-        	!	phi_y(i,j) = phi_yn(i,j)
-            !endif
-                                         
+                              
         ENDDO
     ENDDO
 
@@ -572,39 +566,6 @@ SUBROUTINE EXTRAP(Nx,Ny,hx,hy,phi,phi_x,phi_y,phi_xy,prox,width)
     
     integer :: i,j,k,l,count
     real(kind=8) :: phisum,phixsum,phiysum,phixysum
-    
-    !DO i = 2,Nx+1
-    !    DO j = 2,Ny+1
-	!		if (prox(i,j) == width) then
-	!						
-	!			count = 0
-	!			phisum = 0.0
-	!			phixsum = 0.0
-	!			phiysum = 0.0
-	!			phixysum = 0.0
-	!						
-	!			DO k = -1,1
-	!				DO l = -1,1
-	!							
-	!					if (prox(i+k,j+l) > 0 .AND. prox(i+k,j+l) < width) then
-	!						count = count + 1
-	!						phisum = phisum + phi(i+k,j+l) + (-k*hx*phi_x(i+k,j+l)-l*hy*phi_y(i+k,j+l))
-	!						phixsum = phixsum + phi_x(i+k,j+l)
-	!						phiysum = phiysum + phi_y(i+k,j+l)
-	!						phixysum = phixysum + phi_xy(i+k,j+l)
-	!					endif
-	!					
-	!				ENDDO
-	!			ENDDO
-	!			
-	!			phi(i,j) = phisum/count
-	!			phi_x(i,j) = phixsum/count
-	!			phi_y(i,j) = phiysum/count
-	!			phi_xy(i,j) = phixysum/count
-	!					
-	!		endif
-    !    ENDDO
-    !ENDDO    
      
     DO i = 2,Nx+1
         DO j = 2,Ny+1
@@ -666,31 +627,24 @@ SUBROUTINE BCCHECK(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox
     real(kind=8), dimension(6) :: herm1,herm2,herm3,herm4,herm5,herm6,herm7,herm8
     logical :: trigger
 
-	trigger = .FALSE.
+    trigger = .FALSE.
 
-	DO i=2,Nx+1
-		DO j=2,Ny+1
-		
-			if (prox(i,j) == width-2 .AND. &
-		        ((phi(i,j)*phi(i,  j+1) < 0.0) .OR. &
-                 (phi(i,j)*phi(i,  j-1) < 0.0) .OR. &
-                 (phi(i,j)*phi(i+1,j+1) < 0.0) .OR. &
-                 (phi(i,j)*phi(i+1,j)   < 0.0) .OR. &
-                 (phi(i,j)*phi(i+1,j-1) < 0.0) .OR. &
-                 (phi(i,j)*phi(i-1,j+1) < 0.0) .OR. &
-                 (phi(i,j)*phi(i-1,j)   < 0.0) .OR. &
-                 (phi(i,j)*phi(i-1,j-1) < 0.0))) then
+    DO i=2,Nx+1
+        DO j=2,Ny+1
+
+            if (prox(i,j) == width-1 .AND. phi(i,j) < max(hx,hy)) then 
 
                 trigger = .TRUE.
                 continue
+
             endif
             
-		ENDDO
-	ENDDO
+        ENDDO
+    ENDDO
 
-	if (trigger) then
-		CALL REBUILD(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox,width)
-	endif
+    if (trigger) then
+        CALL REBUILD(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox,width)
+    endif
 
 END SUBROUTINE BCCHECK
 
@@ -767,17 +721,7 @@ SUBROUTINE PROXY(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox,w
     DO i = 2,Nx+1
         DO j = 2,Ny+1
                             
-            !if ((phi(i,j)*phi(i,  j+1) < 0.0) .OR. &
-            !    (phi(i,j)*phi(i,  j-1) < 0.0) .OR. &
-            !    (phi(i,j)*phi(i+1,j+1) < 0.0) .OR. &
-            !    (phi(i,j)*phi(i+1,j)   < 0.0) .OR. &
-            !    (phi(i,j)*phi(i+1,j-1) < 0.0) .OR. &
-            !    (phi(i,j)*phi(i-1,j+1) < 0.0) .OR. &
-            !    (phi(i,j)*phi(i-1,j)   < 0.0) .OR. &
-            !    (phi(i,j)*phi(i-1,j-1) < 0.0)) then
-
 			if (abs(phi(i,j)) < max(hx,hy)) then
-
                 prox(i,j) = 1
             endif
                         
@@ -817,25 +761,6 @@ SUBROUTINE PROXY(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox,w
             
         ENDDO
     ENDDO
-    
-    ! Boundary nodes corresponding to touching boundaries
-    !DO i = 2,Nx+1
-    !    DO j = 2,Ny+1
-    !        
-    !        if (prox(i,j) == width .AND. &
-    !        	prox(i,j+1)   > 0  .AND. &
-    !        	prox(i,j-1)   > 0  .AND. &
-    !        	prox(i+1,j-1) > 0  .AND. &
-    !        	prox(i+1,j)   > 0  .AND. &
-    !        	prox(i+1,j+1) > 0  .AND. &
-    !        	prox(i-1,j-1) > 0  .AND. &
-    !        	prox(i-1,j)   > 0  .AND. &
-    !        	prox(i-1,j+1) > 0) then
-    !            prox(i,j) = width-1
-    !        endif
-    !        
-    !    ENDDO
-    !ENDDO
     
     ! Copy to boundaries appropriately
     DO i = 2,Nx+1
