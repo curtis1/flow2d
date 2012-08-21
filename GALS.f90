@@ -1013,7 +1013,7 @@ SUBROUTINE REINIT(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phi,phi_x,phi_y,phi_xy,prox,
     ENDDO
         	
     max_iter = 100
-    tol = 0.100E-15    
+    tol = 0.100E-12    
     alpha = 0.9
     badNear = 0
     
