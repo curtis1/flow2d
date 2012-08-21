@@ -145,7 +145,7 @@ SUBROUTINE SAVEDATA2(Nx,Ny,Lx,Ly,time,xwhole,ywhole,phiLS,s_phiLS,w_phiLS,H,s_H,
     
 
     !FORMATS
-40  FORMAT (I3)
+40  FORMAT (I5)
 50  FORMAT (A)
 60  FORMAT (A, I3, 1X, A, I3, 1X ,A)
 70  FORMAT (1pE10.3)  !9F10.4
