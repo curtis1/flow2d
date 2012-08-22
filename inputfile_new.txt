@@ -23,12 +23,10 @@ This is a data file, do not change format
 !
 !** INTERFACE **
 ! LS_type - (1) Standard, (2) CLSVOF, (3) G.A.L.S.
-! reinstep - time (in sec) between L.S. reinitialization (G.A.L.S. only)
    trackphase = T
       LS_type = 3
         width = 5
-     reintime = 0.0005
-     reinstep = 99999999
+     reintime = 0.5
    immersedbc = F
 !
 !

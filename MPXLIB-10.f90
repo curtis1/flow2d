@@ -43,7 +43,7 @@ PROGRAM MPXLIB
         integer :: iter,itermax,iterprint                           ! iteration integers, not used
         integer :: MBDCND,N,M,NBDCND,IDIMF,IERROR                   ! for fish pack solver
         integer :: solvertype,precond
-        integer :: IC, reinstep
+        integer :: IC
         integer :: xdirgo,ydirgo
         integer :: BCnorth,BCsouth,BCeast,BCwest, &
                            BCPnorth,BCPsouth,BCPeast,BCPwest, &
@@ -392,12 +392,10 @@ PROGRAM MPXLIB
         ! ** INTERFACE **
         READ (UNIT=2,FMT=50) variables                               ! skip text line
         READ (UNIT=2,FMT=50) variables                               ! skip text line
-        READ (UNIT=2,FMT=50) variables                               ! skip text line
         READ (UNIT=2,FMT=80) trackphase                              ! track the interface
         READ (UNIT=2,FMT=60) LS_type                                 ! LS Method Type
         READ (UNIT=2,FMT=60) width                                   ! GALS Narrow band width
         READ (UNIT=2,FMT=70) reintime                                ! For standard L.S. only
-        READ (UNIT=2,FMT=60) reinstep                                ! For G.A.L.S. only
         READ (UNIT=2,FMT=80) immersedbc                              ! use immersedbc
         !
         !
@@ -1457,11 +1455,6 @@ PROGRAM MPXLIB
                 CALL LSREIN(Nx,Ny,hx,hy,phiLS,H,&
                             BCphisouth,BCphinorth,BCphiwest,BCphieast,ywhole,d_phiLS)
         
-            ELSEIF (LS_type == 3) THEN
-            
-                ! Enforce boundary conditions 
-                !CALL BCGRAD(Nx,Ny,hx,hy,phiLS,phi_x,phi_y)
-        
             ENDIF
 
             ! ----------------------------- !
@@ -1480,12 +1473,6 @@ PROGRAM MPXLIB
                 volume0 = volume           
             endif
  
-            !IF (wave .eqv. .true.) THEN
-            !
-            !    CALL GRADREIN(Nx,Ny,hx,hy,phiLS,phi_x,phi_y,H)
-			!
-            !ENDIF
-            
             ! --------------------------!                  
             ! ---- VOLUME FRACTION ---- !
             ! --------------------------!
@@ -3218,8 +3205,6 @@ PROGRAM MPXLIB
            		CALL GALS(Nx,Ny,hx,hy,deltaT,xwhole,ywhole,GA,scal,phiLS,phi_x, &
            		          phi_y,phi_xy,prox,x,y,u,v,u_old,v_old,volume,volume0,time,width)
             
-                !CALL BCGRAD(Nx,Ny,hx,hy,phiLS,phi_x,phi_y)
-              
             ENDIF
                                     
             !---------------------END OF LSM---------------------
@@ -3915,14 +3900,8 @@ PROGRAM MPXLIB
         ! ---- REINITIALIZE GALS LEVEL SET ---- !
         ! ------------------------------------- !   
 
-        IF ((LS_type == 3) .AND. (time  > 0.0) .AND. (mod(count,reinstep) == 0)) THEN
-            print *, "Preservin volume yo"
-            !CALL LSVOLREIN(Nx,Ny,hx,hy,phiLS,H,&
-            !               BCphisouth,BCphinorth,BCphiwest,BCphieast,&
-            !               ywhole,d_phiLS,rho_one,rho_two,MassInt) 
-            CALL LSREIN(Nx,Ny,hx,hy,phiLS,H,&
-                        BCphisouth,BCphinorth,BCphiwest,BCphieast,ywhole,d_phiLS)
-            CALL GRADREIN(Nx,Ny,hx,hy,phiLS,phi_x,phi_y,H)
+        IF ((LS_type == 3) .AND. (time  > 0.0) .AND. (mod(time,reintime) < deltaT)) THEN
+			CALL REBUILD(Nx,Ny,hx,hy,xwhole,ywhole,GA,scal,phiLS,phi_x,phi_y,phi_xy,prox,width)
         ENDIF
 
         IF ((LS_type /= 3) .AND. (time  > 0.0) .AND. (mod(time,reintime) < deltaT)) THEN
@@ -4281,86 +4260,6 @@ SUBROUTINE LSREIN(Nx,Ny,hx,hy,phiLS,H,&
 
 
 END SUBROUTINE LSREIN
-!********************************************************************
-!*                                                                                                                                        *
-!*                                                           GRADREIN                                                                *
-!*                                                                                                                                        *
-!********************************************************************                                  
-!*
-!*  Routine for reinitializing the gradient of the level set function
-!*  - C. Lee 
-!*                                                                                                                                        *
-!********************************************************************
-SUBROUTINE GRADREIN(Nx,Ny,hx,hy,phi,phi_x,phi_y,H)
-        IMPLICIT NONE
-
-        INTEGER, INTENT(IN):: Nx,Ny
-        
-        INTEGER :: i,j
-
-        REAL(kind=8), INTENT(IN) :: hx,hy
-        REAL(kind=8), DIMENSION(Nx+2,Ny+2), INTENT(IN) :: phi
-        REAL(kind=8), DIMENSION(Nx+2,Ny+2), INTENT(INOUT) :: phi_x,phi_y
-        REAL(kind=8), DIMENSION(Nx+2,Ny+2), INTENT(IN) :: H
-        REAL(kind=8), DIMENSION(Nx+2,Ny+2) :: phi_xold,phi_yold
-
-        DO i=1,Nx+2
-          DO j=1,Ny+2
-            phi_xold(i,j) = phi_x(i,j)
-            phi_yold(i,j) = phi_y(i,j)
-          ENDDO
-        ENDDO
-
-        ! x-derivatives
-        DO j = 2,Ny+1
-          
-          ! First-order
-          phi_x(2,j) = (phi(3,j) - phi(2,j))/hx
-          phi_x(Nx+1,j) = (phi(Nx+1,j) - phi(Nx,j))/hx
-          
-          ! Second-order
-          phi_x(3,j) = (phi(4,j) - phi(2,j))/(2*hx)
-          phi_x(Nx,j) = (phi(Nx+1,j) - phi(Nx-1,j))/(2*hx)
-        
-          ! Fourth-order
-          DO i = 3,Nx
-            
-            phi_x(i,j) = (-phi(i+2,j) + 8*phi(i+1,j) - 8*phi(i-1,j) + phi(i-2,j))/(12*hx)
-            
-          ENDDO
-          
-        ENDDO
-        
-        ! y-derivatives
-        DO i = 2,Nx+1
-          
-          ! First-order
-          phi_y(i,2) = (phi(i,3) - phi(i,2))/hy
-          phi_y(i,Ny+1) = (phi(i,Ny+1) - phi(i,Ny))/hy
-          
-          ! Second-order
-          phi_y(i,3) = (phi(i,4) - phi(i,2))/(2*hy)
-          phi_y(i,Ny) = (phi(i,Ny+1) - phi(i,Ny-1))/(2*hy)
-        
-          ! Fourth-order
-          DO j = 3,Ny
-            
-            phi_y(i,j) = (-phi(i,j+2) + 8*phi(i,j+1) - 8*phi(i,j-1) + phi(i,j-2))/(12*hy)
-            
-          ENDDO
-          
-        ENDDO
-    
-        !DO i=1,Nx+2
-        !  DO j=1,Ny+2
-        !   IF ((H(i,j) > 0.01) .AND. (H(i,j) < 0.99)) THEN
-        !     phi_x(i,j) = phi_xold(i,j)    
-        !     phi_y(i,j) = phi_yold(i,j)    
-        !   ENDIF
-        !  ENDDO
-        !ENDDO
-    
-END SUBROUTINE GRADREIN
 !********************************************************************
 !*                                                                  *
 !*                            LSVOLREIN                             *
