@@ -2431,7 +2431,10 @@ PROGRAM MPXLIB
                 ENDDO
             ENDDO
         endif
-        
+
+        !----- ENSURE THAT INTERMEDIATE VELOCITY IS DEFINED ON BOUNDARIES ----!
+        ustar = u
+        vstar = v 
                         
         ! ---- CONVECTIVE TERMS WITH NO UPWINDING ---- !
         ! ---- Unstable for very convective problems ---- !
