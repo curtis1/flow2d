@@ -130,6 +130,7 @@ PROGRAM MPXLIB
                         e_phiLS,f_phiLS,v_phiLS
         real(kind=8) :: waveh,tw,sw
         real(kind=8) :: MassInt
+        real(kind=8) :: beach_damp
         !
         real(kind=8) :: alpha_1,alpha_2,beta_1,beta_2
         real(kind=8) :: Coef(4)
@@ -410,6 +411,7 @@ PROGRAM MPXLIB
         READ (UNIT=2,FMT=80) rigidbody                               ! add rigid body
         READ (UNIT=2,FMT=80) wedge                                   ! use wedge
         READ (UNIT=2,FMT=80) beach                                   ! use beach (with wedge)
+        READ (UNIT=2,FMT=70) beach_damp                              ! damping coefficient of the porous beach
         READ (UNIT=2,FMT=70) freq									 ! wedge frequency (Hz)
         READ (UNIT=2,FMT=70) wedgeT									 ! wedge time limit
         !
@@ -2366,34 +2368,6 @@ PROGRAM MPXLIB
             
         ENDIF
 
-        ! ---- BEACH ----
-        ! Requires dimensions: 9.114 x ~0.7595 (Actual Tank Dimensions)
-        ! Remains stationary so no need for its own Heaviside function
-        if (beach) then
-            DO i=1,Nx+1
-                DO j=1,Ny+2
-
-                    if (xwhole(i) .GE. 8.942 .AND. ywhole(j) .LE. 0.520) then
-                        u(i,j) = 0.0
-                    elseif (xwhole(i) < 8.942 .AND. ywhole(j) .LE. 0.5019*xwhole(i) - 3.9683) then
-                        u(i,j) = 0.0
-                    endif
-
-                ENDDO
-            ENDDO
-            DO i=1,Nx+2
-                DO j=1,Ny+1
-
-                    if (xwhole(i) .GE. 8.942 .AND. ywhole(j) .LE. 0.520) THEN
-                        v(i,j) = 0.0
-                    elseif (xwhole(i) < 8.942 .AND. ywhole(j) .LE. 0.5019*xwhole(i) - 3.9683) then
-                        v(i,j) = 0.0
-                    endif
-
-                ENDDO
-            ENDDO
-        endif
-
         ! ---- REEF ----
         ! Requires dimensions: 40.0 x 2.0
         ! Remains stationary so no need for its own Heaviside function
@@ -2637,18 +2611,27 @@ PROGRAM MPXLIB
                              mu_one*H(i,j-1) + mu_two*(1.0-H(i,j-1)) + &
                            mu_one*H(i+1,j-1) + mu_two*(1.0-H(i+1,j-1)))
                 mu_e = mu_one*H(i+1,j) + mu_two*(1.0-H(i+1,j))
-                mu_w = mu_one*H(i,j) + mu_two*(1.0-H(i,j))                                                         
+                mu_w = mu_one*H(i,j) + mu_two*(1.0-H(i,j))                                                       
 
-                                
                 ! the viscous term
                 Visc = (2.0*mu_e*u_xe - 2.0*mu_w*u_xw)/hx + &
                        (mu_n*(u_yn + v_xn) - mu_s*(u_ys + v_xs))/hy                        
-                       ! note, i corresponds to ihalf
-                                
+                       ! note, i corresponds to ihalf  
+ 
                 ! density at the half node
                 rho_O = 0.5*(rho_one*H(i,j) + rho_two*(1.0-H(i,j))) + &
                         0.5*(rho_one*H(i+1,j) + rho_two*(1.0-H(i+1,j)))
-                                
+
+				! Additional viscous force due to spongy beach
+		        ! Requires dimensions: 9.114 x ~0.7595 (Actual Tank Dimensions)
+				if (beach) then
+                    		if (xwhole(i) .GE. 8.942 .AND. ywhole(j) .LE. 0.520) then
+								Visc = Visc - beach_damp*rho_O*u(i,j)
+                    		elseif (xwhole(i) < 8.942 .AND. ywhole(j) .LE. 0.5019*xwhole(i) - 3.9683) then
+								Visc = Visc - beach_damp*rho_O*u(i,j)
+                    		endif
+        		endif 
+
                 ! surface tension - only for fluid/vapor interface
                 IF (trackphase .EQV. .TRUE.) THEN 
                     ! get the curvature 
@@ -2715,16 +2698,26 @@ PROGRAM MPXLIB
                 mu_w = 0.25*(mu_one*H(i,j) + mu_two*(1.0-H(i,j)) + &
                              mu_one*H(i-1,j) + mu_two*(1.0-H(i-1,j)) + &
                              mu_one*H(i-1,j+1) + mu_two*(1.0-H(i-1,j+1)) + &
-                             mu_one*H(i,j+1) + mu_two*(1.0-H(i,j+1)) )                                                         
-    
-                Visc = (mu_e*(u_ye + v_xe) - mu_w*(u_yw + v_xw))/hx + &
+                             mu_one*H(i,j+1) + mu_two*(1.0-H(i,j+1)) )  
+
+        		Visc = (mu_e*(u_ye + v_xe) - mu_w*(u_yw + v_xw))/hx + &
                        (2.0*mu_n*v_yn - 2.0*mu_s*v_ys)/hy                                        
                        ! note, j corresponds to jhalf
     
                 ! density at the half node
                 rho_O = 0.5*(rho_one*H(i,j) + rho_two*(1.0-H(i,j))) + &
                         0.5*(rho_one*H(i,j+1) + rho_two*(1.0-H(i,j+1)))
-                        
+
+				! Additional viscous force due to spongy beach
+        		! Requires dimensions: 9.114 x ~0.7595 (Actual Tank Dimensions)
+				if (beach) then
+                    		if (xwhole(i) .GE. 8.942 .AND. ywhole(j) .LE. 0.520) then
+								Visc = Visc - beach_damp*rho_O*v(i,j)
+                    		elseif (xwhole(i) < 8.942 .AND. ywhole(j) .LE. 0.5019*xwhole(i) - 3.9683) then
+								Visc = Visc - beach_damp*rho_O*v(i,j)
+                    		endif
+        		endif
+
                 ! surface tension
                 IF (trackphase .EQV. .TRUE.) THEN
                     ! get the curvature

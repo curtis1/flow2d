@@ -1,7 +1,7 @@
 This is a data file, do not change format
 !** GEOMETRY **
-           Nx = 600
-           Ny = 50
+           Nx = 300
+           Ny = 25
            Lx = 9.114
            Ly = 0.7595
 !
@@ -18,7 +18,7 @@ This is a data file, do not change format
 !** TIME **
    time_print = 0.02
      time_max = 200.00
-    stability = 0.05
+    stability = 0.025
 !
 !
 !** INTERFACE **
@@ -39,7 +39,8 @@ This is a data file, do not change format
     rigidbody = F
         wedge = T
         beach = T
-         freq = 0.75
+   beach_damp = 40.0
+         freq = 0.85
        wedgeT = 200.0
 !
 !
