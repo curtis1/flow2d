@@ -412,7 +412,7 @@ PROGRAM MPXLIB
         READ (UNIT=2,FMT=80) wedge                                   ! use wedge
         READ (UNIT=2,FMT=80) beach                                   ! use beach (with wedge)
         READ (UNIT=2,FMT=70) beach_damp                              ! damping coefficient of the porous beach
-        READ (UNIT=2,FMT=70) freq									 ! wedge frequency (Hz)
+        READ (UNIT=2,FMT=70) freq									 ! wedge frequency (0.1325*setting Hz)
         READ (UNIT=2,FMT=70) wedgeT									 ! wedge time limit
         !
         !
@@ -727,6 +727,9 @@ PROGRAM MPXLIB
         n_rb_ay = 0.0
         n1_rb_ax = 0.0
         n1_rb_ay = 0.0
+
+        ! wedge frequency (0.1325*setting Hz)
+        freq = 0.1325*freq
         
         ! Rotation variables
         
